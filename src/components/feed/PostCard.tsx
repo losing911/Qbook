@@ -2,10 +2,11 @@
 
 import { useMemo } from 'react';
 import { SocialPost } from '@/lib/types';
-import { Heart, MessageCircle, Repeat2, Share2, MoreHorizontal, ShieldAlert, Zap, User } from 'lucide-react';
+import { ShieldAlert, Zap, User, MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import Link from 'next/link';
+import { PostInteraction } from './PostInteraction';
 
 interface PostCardProps {
     post: SocialPost;
@@ -25,17 +26,18 @@ export function PostCard({ post }: PostCardProps) {
     }, [post.author_type]);
 
     const RoleIcon = roleBadge.icon;
+    const authorHandle = post.author_handle || post.id.split('_')[1] || 'user';
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 border-b border-card-border hover:bg-card-hover transition-colors cursor-pointer"
+            className="p-4 border-b border-card-border hover:bg-card-hover transition-colors"
         >
 
             <div className="flex gap-4">
                 {/* Avatar */}
-                <div className="shrink-0 relative">
+                <Link href={`/profile/${authorHandle}`} className="shrink-0 relative cursor-pointer">
                     {post.author_avatar ? (
                         <div className="w-10 h-10 rounded-full overflow-hidden border border-card-border">
                             <img
@@ -49,17 +51,17 @@ export function PostCard({ post }: PostCardProps) {
                             <RoleIcon size={20} />
                         </div>
                     )}
-                </div>
+                </Link>
 
                 <div className="flex-1 min-w-0">
                     {/* Header */}
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 overflow-hidden">
-                            <span className="font-bold text-foreground truncate">
+                            <Link href={`/profile/${authorHandle}`} className="font-bold text-foreground truncate hover:underline cursor-pointer">
                                 {post.author_name || post.author_type.toUpperCase()}
-                            </span>
+                            </Link>
                             <span className="text-muted-foreground text-sm truncate">
-                                {post.author_handle || `@${post.id.split('_')[1] || 'user'}`}
+                                @{authorHandle}
                             </span>
                             <span className={clsx("text-[10px] px-1 py-0.5 rounded opacity-50 uppercase border border-current", roleBadge.color)}>
                                 {post.author_type}
@@ -97,34 +99,7 @@ export function PostCard({ post }: PostCardProps) {
                     )}
 
                     {/* Actions */}
-                    <div className="mt-3 flex justify-between items-center text-muted-foreground max-w-md">
-                        <button className="group flex items-center gap-2 hover:text-primary transition-colors text-sm">
-                            <div className="p-2 rounded-full group-hover:bg-primary/10 transition-colors">
-                                <MessageCircle size={18} />
-                            </div>
-                            <span>{post.engagement.comments}</span>
-                        </button>
-
-                        <button className="group flex items-center gap-2 hover:text-green-500 transition-colors text-sm">
-                            <div className="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
-                                <Repeat2 size={18} />
-                            </div>
-                            <span>{post.engagement.shares}</span>
-                        </button>
-
-                        <button className="group flex items-center gap-2 hover:text-accent transition-colors text-sm">
-                            <div className="p-2 rounded-full group-hover:bg-accent/10 transition-colors">
-                                <Heart size={18} />
-                            </div>
-                            <span>{post.engagement.likes}</span>
-                        </button>
-
-                        <button className="group flex items-center gap-2 hover:text-primary transition-colors text-sm">
-                            <div className="p-2 rounded-full group-hover:bg-primary/10 transition-colors">
-                                <Share2 size={18} />
-                            </div>
-                        </button>
-                    </div>
+                    <PostInteraction postId={post.id} metrics={post.engagement} />
                 </div>
             </div>
         </motion.div>

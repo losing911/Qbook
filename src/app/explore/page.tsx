@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { PostCard } from '@/components/feed/PostCard';
+import { CreatePost } from '@/components/feed/CreatePost';
 import { fetchSocialFeed } from '@/lib/api';
 import { Search } from 'lucide-react';
 
@@ -27,7 +28,10 @@ export default function ExplorePage() {
             </div>
 
             <div className="divide-y divide-card-border">
-                <div className="p-4 font-bold text-xl border-b border-card-border">Trending Now</div>
+                {/* Create Post Section */}
+                <CreatePost />
+
+                <div className="p-4 font-bold text-xl border-b border-card-border bg-card/50">Trailing Now</div>
                 {isLoading ? (
                     <div className="p-8 text-center text-muted-foreground animate-pulse">Scanning frequencies...</div>
                 ) : (
