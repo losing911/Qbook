@@ -27,22 +27,31 @@ else
 fi
 
 # 3. Prepare Application Directory
-# Note: In CyberPanel, the git repo usually goes into public_html or a subdirectory
 echo "📂 Preparing Application Directory: $APP_DIR"
 mkdir -p $APP_DIR
+cd $APP_DIR
+
+# 3.1 Git Clone/Pull
+REPO_URL="https://github.com/losing911/Qbook.git"
+if [ -d ".git" ]; then
+    echo "🔄 Pulling latest changes from GitHub..."
+    git pull origin main
+else
+    echo "⬇️ Cloning repository from GitHub..."
+    # Clone into current directory
+    git clone $REPO_URL .
+fi
 
 # 4. Install Dependencies & Build
 echo "📥 Installing NPM Dependencies..."
-cd $APP_DIR
-
-# Check if package.json exists (assuming files are already there or git pulled)
+# Check if package.json exists
 if [ -f "package.json" ]; then
     npm install
     
     echo "🏗️ Building Next.js Application..."
     npm run build
 else
-    echo "❌ Error: package.json not found in $APP_DIR. ensure you have uploaded the code or git pulled."
+    echo "❌ Error: package.json not found in $APP_DIR."
     exit 1
 fi
 
