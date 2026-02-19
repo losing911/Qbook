@@ -2,16 +2,21 @@
 
 import { Search, MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 
-const TRENDS = [
-    { category: 'Technology', topic: 'Neural Link V4', posts: '125K' },
-    { category: 'Politics', topic: 'Sector 7 Riots', posts: '89K' },
-    { category: 'Entertainment', topic: '#GlitchPop', posts: '54K' },
-    { category: 'Business', topic: 'CorpTech Stock', posts: '32K' },
-    { category: 'World', topic: 'Weather Control Failure', posts: '21K' },
-];
+async function fetchTrends() {
+    const res = await fetch('/api/trends');
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.data || [];
+}
 
 export function RightPanel() {
+    const { data: trends, isLoading } = useQuery({
+        queryKey: ['trends'],
+        queryFn: fetchTrends
+    });
+
     return (
         <aside className="fixed right-0 top-0 h-screen w-[350px] border-l border-card-border p-4 hidden lg:block overflow-y-auto">
             {/* Search */}
@@ -30,24 +35,28 @@ export function RightPanel() {
             <div className="bg-card rounded-2xl border border-card-border overflow-hidden">
                 <div className="p-4 text-xl font-bold">Trends for you</div>
 
-                {TRENDS.map((trend, i) => (
-                    <motion.div
-                        key={trend.topic}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="px-4 py-3 hover:bg-card-hover cursor-pointer transition-colors relative"
-                    >
-                        <div className="flex justify-between items-start">
-                            <div className="text-xs text-muted-foreground">{trend.category}</div>
-                            <button className="text-muted-foreground hover:bg-primary/10 hover:text-primary p-1 rounded-full transition-colors">
-                                <MoreHorizontal size={14} />
-                            </button>
-                        </div>
-                        <div className="font-bold text-foreground">{trend.topic}</div>
-                        <div className="text-xs text-muted-foreground">{trend.posts} broadcasts</div>
-                    </motion.div>
-                ))}
+                {isLoading ? (
+                    <div className="p-4 text-muted-foreground animate-pulse">Loading trends...</div>
+                ) : (
+                    trends?.map((trend: any, i: number) => (
+                        <motion.div
+                            key={trend.tag || trend.topic}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="px-4 py-3 hover:bg-card-hover cursor-pointer transition-colors relative"
+                        >
+                            <div className="flex justify-between items-start">
+                                <div className="text-xs text-muted-foreground">Trending in Universe</div>
+                                <button className="text-muted-foreground hover:bg-primary/10 hover:text-primary p-1 rounded-full transition-colors">
+                                    <MoreHorizontal size={14} />
+                                </button>
+                            </div>
+                            <div className="font-bold text-foreground">{trend.tag || trend.topic}</div>
+                            <div className="text-xs text-muted-foreground">{trend.volume || 'high'} activity</div>
+                        </motion.div>
+                    ))
+                )}
 
                 <div className="p-4 text-primary hover:bg-card-hover cursor-pointer text-sm transition-colors">
                     Show more
