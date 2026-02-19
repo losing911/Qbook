@@ -37,9 +37,14 @@ if [ -d ".git" ]; then
     echo "🔄 Pulling latest changes from GitHub..."
     git pull origin main
 else
-    echo "⬇️ Cloning repository from GitHub..."
-    # Clone into current directory
-    git clone $REPO_URL .
+    echo "⬇️ Directory not empty. Initializing and pulling..."
+    # Safe methods for non-empty dir
+    git init
+    git remote add origin $REPO_URL
+    git fetch origin
+    git reset --hard origin/main
+    git branch -M main
+    git branch -u origin/main main
 fi
 
 # 4. Install Dependencies & Build
