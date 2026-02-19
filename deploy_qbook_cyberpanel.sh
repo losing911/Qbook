@@ -33,6 +33,10 @@ cd $APP_DIR
 
 # 3.1 Git Clone/Pull
 REPO_URL="https://github.com/losing911/Qbook.git"
+
+# Fix "dubious ownership" error
+git config --global --add safe.directory $APP_DIR
+
 if [ -d ".git" ]; then
     echo "🔄 Pulling latest changes from GitHub..."
     git pull origin main
