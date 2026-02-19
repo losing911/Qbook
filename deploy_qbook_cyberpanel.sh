@@ -38,11 +38,19 @@ REPO_URL="https://github.com/losing911/Qbook.git"
 git config --global --add safe.directory $APP_DIR
 
 if [ -d ".git" ]; then
-    echo "🔄 Pulling latest changes from GitHub..."
-    git pull origin main
+    echo "🔄 .git directory found. Ensuring remote consistency..."
+    # Ensure origin is pointing to the correct URL
+    if git remote | grep -q "^origin$"; then
+        git remote set-url origin $REPO_URL
+    else
+        git remote add origin $REPO_URL
+    fi
+    
+    # Sync with remote
+    git fetch origin
+    git reset --hard origin/main
 else
-    echo "⬇️ Directory not empty. Initializing and pulling..."
-    # Safe methods for non-empty dir
+    echo "⬇️ Directory not a git repo. Initializing..."
     git init
     git remote add origin $REPO_URL
     git fetch origin
