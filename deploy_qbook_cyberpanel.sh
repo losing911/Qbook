@@ -26,6 +26,14 @@ else
     echo "✅ Node.js is already installed: $(node -v)"
 fi
 
+# 2.1 Check for NPM
+if ! command -v npm &> /dev/null; then
+    echo "⚠️ npm command not found. Installing npm..."
+    apt-get install -y npm
+else
+    echo "✅ npm is installed: $(npm -v)"
+fi
+
 # 3. Prepare Application Directory
 echo "📂 Preparing Application Directory: $APP_DIR"
 mkdir -p $APP_DIR
@@ -74,6 +82,11 @@ fi
 
 # 5. Create Systemd Service
 echo "⚙️ Creating Systemd Service ($SERVICE_NAME)..."
+
+# Detect NPM path
+NPM_PATH=$(which npm)
+echo "   - NPM Path: $NPM_PATH"
+
 cat <<EOF > /etc/systemd/system/$SERVICE_NAME.service
 [Unit]
 Description=QBook Next.js Application
@@ -83,7 +96,7 @@ After=network.target
 User=root
 # Change User to the website owner if desired (e.g., 'admin' or specific user)
 WorkingDirectory=$APP_DIR
-ExecStart=/usr/bin/npm start -- -p $PORT
+ExecStart=$NPM_PATH start -- -p $PORT
 Restart=always
 Environment=NODE_ENV=production
 # Add other env vars here or use EnvironmentFile=.env
