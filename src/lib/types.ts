@@ -20,10 +20,13 @@ export interface SocialPost {
     timestamp: string;
     sentiment?: number;
     // New Author Fields
+    author_id?: string;
     author_handle?: string;
     author_name?: string;
     author_avatar?: string;
+    avatar?: string;
     category?: string;
+    is_local?: boolean;
 }
 
 export interface SocialFeed {
