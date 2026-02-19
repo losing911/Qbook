@@ -16,14 +16,24 @@ echo "📦 Updating system and installing dependencies..."
 apt-get update
 apt-get install -y curl git unzip
 
-# 2. Install Node.js (if not present or wrong version)
-echo "Checking Node.js..."
-if ! command -v node &> /dev/null; then
-    echo "🟢 Installing Node.js $NODE_VERSION..."
+# 2. Install/Update Node.js (Force v20)
+echo "Checking Node.js Version..."
+CURRENT_NODE_VER=$(node -v 2>/dev/null | cut -d. -f1 | tr -d 'v')
+REQUIRED_VER=20
+
+if [[ -z "$CURRENT_NODE_VER" ]] || [[ "$CURRENT_NODE_VER" -lt "$REQUIRED_VER" ]]; then
+    echo "⚠️  Node.js version is $CURRENT_NODE_VER (or missing). Upgrading to Node.js $NODE_VERSION..."
+    # Remove old version to avoid conflicts (optional but recommended)
+    apt-get remove -y nodejs
+    apt-get autoremove -y
+    
+    # Install Node.js 20
     curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION | bash -
     apt-get install -y nodejs
+    
+    echo "✅ Node.js updated to: $(node -v)"
 else
-    echo "✅ Node.js is already installed: $(node -v)"
+    echo "✅ Node.js is up to date: $(node -v)"
 fi
 
 # 2.1 Check for NPM
