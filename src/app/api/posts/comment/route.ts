@@ -21,8 +21,32 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ success: true }, { status: 201 });
 
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}
+
+export async function GET(req: NextRequest) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const post_id = searchParams.get('post_id');
+
+        if (!post_id) {
+            return NextResponse.json({ error: "Post ID required" }, { status: 400 });
+        }
+
+        const [comments]: any = await pool.query(
+            `SELECT c.*, u.handle, u.display_name, u.avatar 
+             FROM comments c
+             JOIN users u ON c.user_id = u.id
+             WHERE c.post_id = ?
+             ORDER BY c.timestamp ASC`,
+            [post_id]
+        );
+
+        return NextResponse.json({ comments });
+
     } catch (error) {
-        console.error("Comment Error:", error);
+        console.error("Fetch Comments Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

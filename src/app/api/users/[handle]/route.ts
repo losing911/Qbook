@@ -19,10 +19,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ hand
         // 2. Local User Found
         if (user) {
             const [localPosts]: any = await pool.query(
-                `SELECT * FROM posts WHERE user_id = ? ORDER BY timestamp DESC`,
-                [user.id]
+                `
+                SELECT p.*, 'post' as type, NULL as reposter_id, NULL as repost_timestamp
+                FROM posts p 
+                WHERE p.user_id = ?
+                
+                UNION
+                
+                SELECT p.*, 'repost' as type, i.user_id as reposter_id, i.timestamp as repost_timestamp
+                FROM posts p
+                JOIN interactions i ON p.id = i.post_id
+                WHERE i.user_id = ? AND i.type = 'repost'
+                
+                ORDER BY timestamp DESC
+                `,
+                [user.id, user.id]
             );
-            posts = localPosts.map((p: any) => ({ ...p, is_local: true }));
+            posts = localPosts.map((p: any) => ({
+                ...p,
+                is_local: true,
+                is_repost: p.type === 'repost',
+                original_timestamp: p.timestamp,
+                timestamp: p.repost_timestamp || p.timestamp // Use repost time for sorting if it's a repost
+            }));
         }
         // 3. Not in DB? Try Simulation / Remote Feed
         else {

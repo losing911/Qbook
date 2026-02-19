@@ -35,26 +35,35 @@ export function RightPanel() {
             <div className="bg-card rounded-2xl border border-card-border overflow-hidden">
                 <div className="p-4 text-xl font-bold">Trends for you</div>
 
+                import Link from 'next/link';
+                // ... (imports)
+
+                // ... (in component)
                 {isLoading ? (
                     <div className="p-4 text-muted-foreground animate-pulse">Loading trends...</div>
                 ) : (
                     trends?.map((trend: any, i: number) => (
-                        <motion.div
+                        <Link
                             key={trend.tag || trend.topic}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="px-4 py-3 hover:bg-card-hover cursor-pointer transition-colors relative"
+                            href={`/explore?q=${encodeURIComponent(trend.tag || trend.topic)}`}
+                            className="block"
                         >
-                            <div className="flex justify-between items-start">
-                                <div className="text-xs text-muted-foreground">Trending in Universe</div>
-                                <button className="text-muted-foreground hover:bg-primary/10 hover:text-primary p-1 rounded-full transition-colors">
-                                    <MoreHorizontal size={14} />
-                                </button>
-                            </div>
-                            <div className="font-bold text-foreground">{trend.tag || trend.topic}</div>
-                            <div className="text-xs text-muted-foreground">{trend.volume || 'high'} activity</div>
-                        </motion.div>
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="px-4 py-3 hover:bg-card-hover cursor-pointer transition-colors relative"
+                            >
+                                <div className="flex justify-between items-start">
+                                    <div className="text-xs text-muted-foreground">Trending in Universe</div>
+                                    <button className="text-muted-foreground hover:bg-primary/10 hover:text-primary p-1 rounded-full transition-colors">
+                                        <MoreHorizontal size={14} />
+                                    </button>
+                                </div>
+                                <div className="font-bold text-foreground">{trend.tag || trend.topic}</div>
+                                <div className="text-xs text-muted-foreground">{trend.volume || 'high'} activity</div>
+                            </motion.div>
+                        </Link>
                     ))
                 )}
 
