@@ -3,6 +3,7 @@
 import { Search, MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 
 async function fetchTrends() {
     const res = await fetch('/api/trends');
